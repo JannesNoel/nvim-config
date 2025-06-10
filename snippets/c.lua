@@ -49,22 +49,6 @@ local function generate_arg_names(args)
     return sn(nil, nodes)
 end
 
-local function generate_rand_func(args)
-    local rand_range = args[1][1]
-
-    local nodes = {}
-    table.insert(nodes, t("return min + rand() % ("))
-
-    if rand_range == "[min, max]" then
-        table.insert(nodes, t("max+1"))
-    else
-        table.insert(nodes, t("max"))
-    end
-
-    table.insert(nodes, t(" - min);"))
-    return sn(nil, nodes)
-end
-
 -- static snippet nodes (for easier readability && to maintain DRY principle)
 local function includes()
     return sn(nil, {
@@ -95,7 +79,7 @@ local function includes()
             "",
             "",
         }),
-        t({ "// Rand and nanosleep includes", "#include <time.h>", "", "" }),
+        t({ "// Rand and nanosleep includes", "#include <time.h>" }),
     })
 end
 
@@ -104,9 +88,12 @@ local function macros()
         "macros",
         t({
             "// Time related macros",
-            "#define MS_TO_NS(x) (((int) x) * 1e6)",
-            "",
-            "",
+            "#define MS_IN_S 1000",
+            "#define NS_IN_MS 1000000",
+            "#define S_TO_MS(x) ((long) (x * MS_IN_S))",
+            "#define MS_TO_S(x) ((long) (x / MS_IN_S))",
+            "#define MS_TO_NS(x) ((long) (x * NS_IN_MS))",
+            "#define NS_TO_MS(x) ((long) (x / NS_IN_MS))",
         })
     )
 end
@@ -155,18 +142,32 @@ end
 
 -- exported snippets
 local function c_main()
-    return s("c_main", {
-        includes(),
-        macros(),
-        t({ "int main(" }),
-        c(1, {
-            t("void"),
-            t("int argc, char* argv[]"),
-        }),
-        t({ ") {", "\t" }),
-        i(2, "// TODO: implement"),
-        t({ "", "\treturn EXIT_SUCCESS;", "}" }),
-    })
+    return s(
+        "c_main",
+        fmt(
+            [[
+        {}
+
+        {}
+
+        int main({}) {{
+            {}
+
+            return EXIT_SUCCESS;
+        }}
+
+    ]],
+            {
+                includes(),
+                macros(),
+                c(1, {
+                    t("void"),
+                    t("int argc, char* argv[]"),
+                }),
+                i(2, "// TODO: Implement"),
+            }
+        )
+    )
 end
 
 local function check_args()
@@ -298,8 +299,8 @@ local function sleep_ms_func()
         fmt(
             [[
         bool sleep_ms(unsigned int duration_ms) {{
-            unsigned int sleep_sec = duration_ms / 1000;
-            unsigned int sleep_ms = duration_ms % 1000;
+            unsigned int sleep_sec = MS_TO_S(duration_ms);
+            unsigned int sleep_ms = duration_ms % MS_IN_S;
             struct timespec sleep_dur = {{
                 .tv_sec = sleep_sec,
                 .tv_nsec = MS_TO_NS(sleep_ms),
@@ -311,9 +312,9 @@ local function sleep_ms_func()
                 if (sleep_res == -1) {{
                     if (errno == EINTR) {{
                         continue;
-                    }} else {{
-                        sleep_failed = true;
                     }}
+
+                    sleep_failed = true;
                 }}
                 break;
             }}

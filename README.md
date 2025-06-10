@@ -1,4 +1,15 @@
-# 💤 LazyVim
+# Introduction
+This repo contains my config of NeoVim, which is currently derived from
+the LazyVim distribution of Vim.
 
-A starter template for [LazyVim](https://github.com/LazyVim/LazyVim).
-Refer to the [documentation](https://lazyvim.github.io/installation) to get started.
+Any changes to the Base behaviour of vim can be found [here](/lua/config).
+New Plugins and their configuration can be found in [here](/lua/plugins).
+
+To look at the defined plugins check [this](/plugins) out.
+Currently there are only custom plugins for some lanugages.
+
+| Language/File type | Plugin File |
+|:---------|:-----------:|
+| C        | [c.lua](/plugins/c.lua)|
+| Makefile | [make.lua](/plugins/make.lua)|
+
