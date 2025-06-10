@@ -8,7 +8,7 @@ New Plugins and their configuration can be found in [/lua/plugins](/lua/plugins)
 
 ## Custom Snippets
 
-The defined snippets can be found in [/snippets](/snippets) folder.
+The defined snippets can be found in the [/snippets](/snippets) folder.
 Where a filename specifies the language for which the snippet should be set up.
 
 Note: Some of the snippets that were used for the ps_os_2025 test are changed,
