@@ -6,7 +6,9 @@ the LazyVim distribution of Vim.
 Any changes to the Base behaviour of vim can be found [here](/lua/config).
 New Plugins and their configuration can be found in [here](/lua/plugins).
 
-To look at the defined snippets check [this](/snippets) out.
+## Custom Snippets
+
+The defined snippets can be found in [this](/snippets) folder.
 Currently there are only custom snippets for some languages.
 
 | Language/File type | Snippet File |
