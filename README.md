@@ -11,7 +11,7 @@ New Plugins and their configuration can be found in [/lua/plugins](/lua/plugins)
 The defined snippets can be found in the [/snippets](/snippets) folder.
 Where a filename specifies the language for which the snippet should be set up.
 
-Note: Some of the snippets that were used for the ps_os_2025 test are changed,
+Note: Some of the snippets that were used for the ps_os_2025 test are changed
 and converted versions of Matti Fischbachs snippets, which can be found in
 following [repo](https://github.com/jqyDee/ps_os_25s/tree/main/snippets).
 
