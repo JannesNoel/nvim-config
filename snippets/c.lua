@@ -161,8 +161,8 @@ local function c_main()
                 includes(),
                 macros(),
                 c(1, {
-                    t("void"),
                     t("int argc, char* argv[]"),
+                    t("void"),
                 }),
                 i(2, "// TODO: Implement"),
             }
