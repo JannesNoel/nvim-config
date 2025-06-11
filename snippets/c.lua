@@ -6,6 +6,7 @@ local i = ls.insert_node
 local c = ls.choice_node
 local d = ls.dynamic_node
 
+local rep = require("luasnip.extras").rep
 local fmt = require("luasnip.extras.fmt").fmt
 
 -- dynamic snippet nodes (based on prev input / selections)
@@ -37,11 +38,9 @@ local function generate_arg_names(args)
 
         local arg_name = "arg_name" .. j
         table.insert(nodes, t(" " .. used_open))
+        table.insert(nodes, i(j, arg_name))
         if comp_min and last_arg then
-            table.insert(nodes, i(j, arg_name))
             table.insert(nodes, t(", ..."))
-        else
-            table.insert(nodes, i(j, arg_name))
         end
         table.insert(nodes, t(used_close))
     end
@@ -50,16 +49,20 @@ local function generate_arg_names(args)
 end
 
 -- static snippet nodes (for easier readability && to maintain DRY principle)
-local function includes()
+local function disclaimer()
     return sn(nil, {
         t({
             "/*",
-            "\tDisclaimer: I'm using a lot of snippets I created with the luasnip plugin for nvim.",
-            "\tThe code for the snippets can be found in this repo: TODO: Add repo link",
+            "\tDisclaimer: I'm using a lot of snippets which I created with the luasnip plugin for nvim.",
+            "\tThe code for the snippets can be found in this repo: https://github.com/JannesNoel/nvim-config",
             "*/",
             "",
-            "",
         }),
+    })
+end
+
+local function includes()
+    return sn(nil, {
         t({
             "// Base Includes",
             "#include <stdio.h>",
@@ -126,7 +129,7 @@ local function rand_int_incl_max_sn()
     return t({
         "// Generates a random int in interval [min, max]",
         "int rand_int_incl_max(int min, int max) {",
-        "\treturn min + rand() % (max+1 - min);",
+        "\treturn min + (rand() % (max + 1 - min));",
         "}",
     })
 end
@@ -135,7 +138,7 @@ local function rand_int_excl_max_sn()
     return t({
         "// Generates a random int in interval [min, max)",
         "int rand_int_excl_max(int min, int max) {",
-        "\treturn min + rand() % (max - min);",
+        "\treturn min + (rand() % (max - min));",
         "}",
     })
 end
@@ -146,6 +149,7 @@ local function c_main()
         "c_main",
         fmt(
             [[
+        {}
         {}
 
         {}
@@ -158,6 +162,7 @@ local function c_main()
 
     ]],
             {
+                disclaimer(),
                 includes(),
                 macros(),
                 c(1, {
@@ -235,7 +240,7 @@ local function wait_once()
         fmt(
             [[
     if (wait(NULL) == -1) {{
-        perror("wait);
+        perror("wait");
         {}
         exit(EXIT_FAILURE);
     }}
@@ -327,8 +332,168 @@ local function sleep_ms_func()
     )
 end
 
--- todo: signal handling, pthread, mutex, semaphores, barriers (maybe also my_barrier.h), fifo, unnamed pipe, server & client, sockets, files, makefile snippets, message queues, myqueue (ex06), shared_mem, thread_pool, mmap
--- todo: thread_function
+-- Todo add basic thread_attrs
+local function thread_single()
+    return s(
+        "thread_single",
+        fmt(
+            [[
+        pthread_t thread;
+        {} param;
+        if (pthread_create(&thread, NULL, {}, &param) != 0) {{
+            {}
+        }}
+
+
+        // Join thread
+        {}* thread_ret;
+        if (pthread_join(thread, (void**) &thread_ret) != 0) {{
+            {}
+        }}
+    ]],
+            {
+                i(1, "param_type"),
+                i(2, "NULL"),
+                i(3, "// TODO: Handle thread creation err"),
+                i(4, "return_type"),
+                i(5, "// TODO: Handle thread join err"),
+            }
+        )
+    )
+end
+
+-- Todo add basic thread_attrs
+local function thread_mult()
+    return s(
+        "thread_mult",
+        fmt(
+            [[
+        size_t last_idx;
+        size_t thread_amt = {};
+        bool thread_err = false;
+        pthread_t threads[thread_amt];
+        {} params[thread_amt];
+        for (size_t i = 0; i < thread_amt; i++) {{
+            {}
+            // TODO: Construct thread attrs if needed
+            if (pthread_create(&threads[i], NULL, {}, &params[i]) != 0) {{
+                thread_err = true;
+                last_idx = i - 1;
+            }}
+        }}
+
+        // Handle thread creation error
+        if (thread_err) {{
+            for (size_t i = 0; i < last_idx; i++) {{
+                pthread_join(threads[i], NULL);
+            }}
+
+            {}
+            exit(EXIT_FAILURE);
+        }}
+
+        //Join all threads
+        {}* thread_ret[thread_amt];
+        for (size_t i = 0; i < thread_amt; i++) {{
+            if (pthread_join(threads[i], (void**) &thread_ret[i]) != 0) {{
+                {}
+            }}
+        }}
+        ]],
+            {
+                i(1, "thread_amt"),
+                i(2, "param_type"),
+                i(3, "// TODO: Construct param"),
+                i(4, "thread_func"),
+                i(5, "// TODO: Handle error"),
+                i(6, "thread_ret_type"),
+                i(7, "// TODO: Handle thread join error"),
+            }
+        )
+    )
+end
+
+local function thread_func()
+    return s(
+        "thread_func",
+        fmt(
+            [[
+            void* {}(void* param) {{
+                {}* {} = ({}*)param;
+
+                {}
+            }}
+        ]],
+            {
+                i(1, "func_name"),
+                i(2, "arg_type"),
+                i(3, "arg_name"),
+                rep(2),
+                i(4, "// TODO: Implement"),
+            }
+        )
+    )
+end
+
+local function myqueue()
+    return s(
+        "myqueue",
+        fmt(
+            [[
+#ifndef MYQUEUE_H_
+#define MYQUEUE_H_
+
+#include <assert.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <sys/queue.h>  // see queue(7) & stailq(3)
+
+
+struct myqueue_entry {{
+    {} value;
+    STAILQ_ENTRY(myqueue_entry) entries;
+}};
+
+STAILQ_HEAD(myqueue_head, myqueue_entry);
+
+typedef struct myqueue_head myqueue;
+
+static void myqueue_init(myqueue* q) {{
+    STAILQ_INIT(q);
+}}
+
+static bool myqueue_is_empty(myqueue* q) {{
+    return STAILQ_EMPTY(q);
+}}
+
+static void myqueue_push(myqueue* q, {} value) {{
+    struct myqueue_entry* entry = (struct myqueue_entry*)malloc(sizeof(struct myqueue_entry));
+    entry->value = value;
+    STAILQ_INSERT_TAIL(q, entry, entries);
+}}
+
+static {} myqueue_pop(myqueue* q) {{
+    assert(!myqueue_is_empty(q));
+    struct myqueue_entry* entry = STAILQ_FIRST(q);
+    const {} value = entry->value;
+    STAILQ_REMOVE_HEAD(q, entries);
+    free(entry);
+    return value;
+}}
+
+#endif
+            ]],
+            {
+                i(1, "value_type"),
+                rep(1),
+                rep(1),
+                rep(1),
+            }
+        )
+    )
+end
+
+-- todo: signal handling, semaphores, barriers (maybe also my_barrier.h), fifo, unnamed pipe, server & client, sockets, files, makefile snippets, message queues, shared_mem, thread_pool, mmap
 
 return {
     c_main(),
@@ -340,4 +505,8 @@ return {
     srand(),
     rand_int_func(),
     sleep_ms_func(),
+    thread_single(),
+    thread_mult(),
+    thread_func(),
+    myqueue(),
 }
