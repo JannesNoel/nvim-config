@@ -19,3 +19,8 @@ following [repo](https://github.com/jqyDee/ps_os_25s/tree/main/snippets).
 |:---------|:-----------:|
 | C        | [c.lua](/snippets/c.lua)|
 | Makefile | [make.lua](/snippets/make.lua)|
+
+
+Amendment after the test:
+I didn't manage to finish the Snippet files (as you can see).
+Also in the test I forgot to remove the unnecessary time related macros.
